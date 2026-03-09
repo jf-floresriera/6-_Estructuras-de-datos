@@ -1,5 +1,5 @@
 ---
-title: "Variables y tipos de datos"
+title: "Estructura de datos"
 author: "jfloresr@unal.edu.co"
 date: 2026-03-03
 format:
@@ -23,7 +23,7 @@ format:
 
 En este documento desarrollo los ejercicios 6.10 del módulo **Estructuras de datos** aplicados al análisis espacial. A partir de rutas de monitoreo en la Sierra Nevada de Santa Marta y del diseño de metadatos para el PNN Tayrona, se utilizan tuplas, listas, diccionarios y conjuntos en Python para organizar coordenadas, elevaciones y ecosistemas. El objetivo es evidenciar cómo la elección adecuada de la estructura (inmutable o mutable, ordenada o no ordenada) afecta directamente la seguridad topológica, el rendimiento y la claridad de los modelos SIG.
 
-# # Ejercicio 1: Rutas de monitoreo (tuplas y listas)
+# Ejercicio 1: Rutas de monitoreo (tuplas y listas)
 
 Contexto: Trabajas en un proyecto de conservación en la Sierra Nevada de Santa Marta. Los guardabosques realizan recorridos diarios y te envían las coordenadas de los puntos de avistamiento de fauna. Necesitas estructurar esta ruta temporal de forma segura, garantizando que las coordenadas individuales no se alteren, pero permitiendo que la ruta crezca a medida que reportan nuevos puntos.
 
@@ -86,7 +86,6 @@ Recibes un reporte de campo crudo con los ecosistemas observados hoy, el cual co
 Utiliza una operación lógica de conjuntos (intersección) entre la lista oficial de ecosistemas del parque (guardada dentro de tu diccionario en el paso 1) y tus observaciones_unicas. Imprime el resultado para saber qué ecosistemas oficiales fueron efectivamente avistados hoy.
 
 
-
 ```{python}
 # Ejercicio 2: Metadatos y ecosistemas (diccionarios y conjuntos)
 
@@ -128,6 +127,32 @@ print("Ecosistemas oficiales avistados hoy:",
 
 En términos de topología espacial, guardar cada par de coordenadas 
 (X,Y) como una tupla inmutable protege la integridad del punto individual: si un bucle intenta modificar solo la latitud de punto_1, la operación punto_1[0] = 12.0000 genera un error inmediato y evita que la geometría se corrompa silenciosamente. En cambio, la ruta completa se guarda como una lista mutable porque su tamaño sí debe cambiar con el tiempo; los guardabosques pueden reportar nuevos puntos y el algoritmo necesita agregar vértices al final sin recrear toda la estructura desde cero. Esta combinación de tuplas para los elementos y lista para la colección logra un equilibrio entre seguridad y flexibilidad.
+
+
+En julia
+
+```{julia}
+# Coordenada individual como tupla (inmutable)
+punto_1 = (11.1198, -74.0321)
+
+# Ruta completa como vector (mutable)
+ruta_avistamiento = [punto_1]
+
+println("Ruta original: ", ruta_avistamiento)
+
+# Intento de modificar la latitud del punto_1
+try
+    punto_1[1] = 12.0000
+catch e
+    println("Error al modificar punto_1: ", e)
+end
+
+# En cambio, sí puedo cambiar la ruta (agregar otro punto)
+punto_2 = (11.1250, -74.0280)
+push!(ruta_avistamiento, punto_2)
+
+println("Ruta después de push!: ", ruta_avistamiento)
+```  
 
 ## Ejercicio 2: Metadatos y ecosistemas (diccionarios y conjuntos)
 
