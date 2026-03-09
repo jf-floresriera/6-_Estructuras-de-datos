@@ -1,0 +1,138 @@
+---
+title: "Variables y tipos de datos"
+author: "jfloresr@unal.edu.co"
+date: 2026-03-03
+format:
+  html:
+    toc: true
+    number-sections: true
+    theme: cosmo
+  pdf:
+    toc: true
+    toc-title: "Contenido"
+    number-sections: true
+    documentclass: scrreprt
+    geometry:
+      - top=25mm
+      - left=25mm
+      - right=25mm
+      - bottom=25mm
+---
+
+# Introducción
+
+En este documento desarrollo los ejercicios 6.10 del módulo **Estructuras de datos** aplicados al análisis espacial. A partir de rutas de monitoreo en la Sierra Nevada de Santa Marta y del diseño de metadatos para el PNN Tayrona, se utilizan tuplas, listas, diccionarios y conjuntos en Python para organizar coordenadas, elevaciones y ecosistemas. El objetivo es evidenciar cómo la elección adecuada de la estructura (inmutable o mutable, ordenada o no ordenada) afecta directamente la seguridad topológica, el rendimiento y la claridad de los modelos SIG.
+
+# # Ejercicio 1: Rutas de monitoreo (tuplas y listas)
+
+Contexto: Trabajas en un proyecto de conservación en la Sierra Nevada de Santa Marta. Los guardabosques realizan recorridos diarios y te envían las coordenadas de los puntos de avistamiento de fauna. Necesitas estructurar esta ruta temporal de forma segura, garantizando que las coordenadas individuales no se alteren, pero permitiendo que la ruta crezca a medida que reportan nuevos puntos.
+
+Instrucciones de código:
+
+Define tres variables (punto_1, punto_2, punto_3) que almacenen las coordenadas (Latitud, Longitud) como Tuplas estáticas (o su equivalente más seguro en tu lenguaje).
+Punto 1: 11.1198, -74.0321
+Punto 2: 11.1250, -74.0280
+Punto 3: 11.1302, -74.0215
+Crea una colección secuencial y mutable (Lista en Python/Julia o Vector/Lista en R) llamada ruta_avistamiento que contenga los tres puntos iniciales en orden.
+Los guardabosques acaban de reportar un cuarto punto (11.1355, -74.0150). Utiliza el método nativo de tu lenguaje para agregar esta nueva coordenada al final de tu ruta.
+Utilizando la indexación dinámica (indexación negativa o comandos como length/end), extrae el último punto de la ruta y guárdalo en una variable llamada ultimo_reporte.
+Crea una nueva lista/vector paralela llamada elevaciones que contenga las alturas de los cuatro puntos: [850.5, 920.0, 1050.2, 1180.8].
+Calcula e imprime la elevación máxima alcanzada en el recorrido y el número total de puntos visitados (vértices), utilizando las funciones nativas (ej. max(), len(), length()).
+
+
+```{python}
+
+# 1) Puntos como tuplas inmutables
+punto_1 = (11.1198, -74.0321)
+punto_2 = (11.1250, -74.0280)
+punto_3 = (11.1302, -74.0215)
+
+# 2) Lista mutable con la ruta
+ruta_avistamiento = [punto_1, punto_2, punto_3]
+
+# 3) Agregar cuarto punto al final
+punto_4 = (11.1355, -74.0150)
+ruta_avistamiento.append(punto_4)
+
+# 4) Extraer último punto (indexación negativa)
+ultimo_reporte = ruta_avistamiento[-1]
+
+# 5) Lista paralela de elevaciones
+elevaciones = [850.5, 920.0, 1050.2, 1180.8]
+
+# 6) Elevación máxima y número de vértices
+elev_maxima = max(elevaciones)
+num_vertices = len(ruta_avistamiento)
+
+print("Ruta de avistamiento:", ruta_avistamiento)
+print("Último reporte:", ultimo_reporte)
+print(f"Elevación máxima: {elev_maxima} m")
+print(f"Número total de puntos: {num_vertices}")
+```  
+
+# Ejercicio 2: Trabajando con strings
+Contexto: Estás diseñando el esquema de base de datos para los Parques Nacionales Naturales (PNN). Necesitas estructurar los atributos de un parque usando un modelo de clave-valor (similar a GeoJSON) y depurar una lista de observaciones de campo que tiene datos duplicados.
+
+Instrucciones de código:
+
+Crea un Diccionario (o Lista nombrada en R) llamado pnn_tayrona que contenga exactamente las siguientes claves y valores:
+"nombre": “PNN Tayrona”
+"area_hectareas": 15000
+"abierto_turismo": Verdadero (tipo Booleano)
+"ecosistemas": Una lista/vector con los textos "Manglar", "Bosque Seco", y "Coral".
+Emplea la función o método de acceso seguro (ej. .get() en Python o condicionales en R/Julia) para intentar extraer la clave "fecha_creacion". Como no existe, debe devolver el texto "Dato no disponible" sin que el programa colapse. Imprime el resultado.
+Actualiza el diccionario añadiendo una nueva clave llamada "departamento" con el valor "Magdalena".
+Recibes un reporte de campo crudo con los ecosistemas observados hoy, el cual contiene duplicados: observaciones_crudas = ["Manglar", "Coral", "Bosque Seco", "Manglar", "Coral", "Matorral"] Convierte esta colección en un Conjunto (Set o usando unique()) para eliminar los duplicados y guárdalo en la variable observaciones_unicas.
+Utiliza una operación lógica de conjuntos (intersección) entre la lista oficial de ecosistemas del parque (guardada dentro de tu diccionario en el paso 1) y tus observaciones_unicas. Imprime el resultado para saber qué ecosistemas oficiales fueron efectivamente avistados hoy.
+
+
+
+```{python}
+# Ejercicio 2: Metadatos y ecosistemas (diccionarios y conjuntos)
+
+# 1) Diccionario PNN Tayrona
+pnn_tayrona = {
+    "nombre": "PNN Tayrona",
+    "area_hectareas": 15000,
+    "abierto_turismo": True,
+    "ecosistemas": ["Manglar", "Bosque Seco", "Coral"],
+}
+
+# 2) Acceso seguro a clave inexistente
+fecha_creacion = pnn_tayrona.get("fecha_creacion", "Dato no disponible")
+print("Fecha de creación:", fecha_creacion)
+
+# 3) Añadir departamento
+pnn_tayrona["departamento"] = "Magdalena"
+
+# 4) Observaciones crudas y únicas
+observaciones_crudas = [
+    "Manglar", "Coral", "Bosque Seco",
+    "Manglar", "Coral", "Matorral"
+]
+observaciones_unicas = set(observaciones_crudas)
+print("Observaciones únicas:", observaciones_unicas)
+
+# 5) Intersección entre ecosistemas oficiales y observados
+ecosistemas_oficiales = set(pnn_tayrona["ecosistemas"])
+ecosistemas_observados_oficiales = ecosistemas_oficiales.intersection(
+    observaciones_unicas
+)
+print("Ecosistemas oficiales avistados hoy:",
+      ecosistemas_observados_oficiales)
+```   
+
+# Reflexiones y análisis
+
+## Reflexión sobre el Ejercicio 1 Tupla
+
+En términos de topología espacial, guardar cada par de coordenadas 
+(X,Y) como una tupla inmutable protege la integridad del punto individual: si un bucle intenta modificar solo la latitud de punto_1, la operación punto_1[0] = 12.0000 genera un error inmediato y evita que la geometría se corrompa silenciosamente. En cambio, la ruta completa se guarda como una lista mutable porque su tamaño sí debe cambiar con el tiempo; los guardabosques pueden reportar nuevos puntos y el algoritmo necesita agregar vértices al final sin recrear toda la estructura desde cero. Esta combinación de tuplas para los elementos y lista para la colección logra un equilibrio entre seguridad y flexibilidad.
+
+## Ejercicio 2: Metadatos y ecosistemas (diccionarios y conjuntos)
+
+En R existe un debate constante entre usar c() o list() para agrupar información. Si estuviera programando la lista de ecosistemas dentro de las propiedades del parque en R, usaría c("Manglar", "Bosque Seco", "Coral") porque todos los elementos son texto del mismo tipo y se comportan como un vector atómico homogéneo, ideal para aplicar funciones como unique() o intersect(). Reservaría list() para estructuras más complejas donde necesite mezclar tipos o anidar objetos (por ejemplo, combinar un vector de ecosistemas con un vector de coordenadas y con metadatos numéricos), emulando lo que en Python sería un diccionario con valores de distinta naturaleza.
+
+## Pregunta general: Sliceng y diferencias entre lenguajes
+
+En Python, la expresión ruta[1:3] utiliza slicing con extremo superior excluyente: devuelve los elementos en los índices 1 y 2, es decir, dos elementos de la lista. En R y Julia, la notación similar ruta[1:3] incluye ambos extremos del rango, por lo que se obtienen los elementos 1, 2 y 3 de la colección, es decir, tres elementos. Esta diferencia se combina con el hecho de que Python indexa desde 0 y R/Julia desde 1, por lo que copiar código de un lenguaje al otro sin ajustar los rangos puede desplazar subconjuntos enteros de datos o producir errores de índice difíciles de detectar en análisis espaciales.
